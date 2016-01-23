@@ -1,9 +1,9 @@
 #coding:utf8
-'''
+"""
 Created on 2016年1月11日
 
 @author: pan
-'''
+"""
 
 
 class HtmlOutput(object):
@@ -11,14 +11,14 @@ class HtmlOutput(object):
         self.datas =[]
         
     
-    def collectData(self,data):
+    def collect_data(self, data):
         if data is None:
             return None
         self.datas.append(data)
 
 
     
-    def outputHtml(self):
+    def output_html(self):
         fout = open('../out/output.html','w')
         fout.write("<html>")
         fout.write("<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head>")

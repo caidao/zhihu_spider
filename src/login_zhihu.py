@@ -1,9 +1,9 @@
 #coding:utf8
-'''
+"""
 Created on 2016��1��18��
 
 @author: pan
-'''
+"""
 import time
 import json
 import os
@@ -49,7 +49,7 @@ def login(email='', password='', captcha='', savecookies=True):
 
 def create_cookies():
     if os.path.isfile(_Cookies_File_Name) is False:
-        email ='panyiwen2009@gmail.com' #raw_input('email: ')
+        email ='panyiwen2009@gmail.com'#raw_input('email: ')
         password = raw_input('password: ')
         url = get_captcha_url()
         _save_captcha(url)
@@ -89,5 +89,3 @@ def loginZhihu():
 if __name__ == '__main__':
     _init()
     create_cookies()
-
-    

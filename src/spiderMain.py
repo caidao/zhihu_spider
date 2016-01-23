@@ -1,9 +1,9 @@
 #coding:utf8
-'''
+"""
 Created on 2016年1月11日
 
 @author: pan
-'''
+"""
 import urlManager, htmlDownloader, htmlParaser, htmlOutput
 from src.login_zhihu import loginZhihu
 
@@ -14,24 +14,24 @@ class SpiderMain(object):
         self.parsers = htmlParaser.HtmlParser()
         self.outPuters = htmlOutput.HtmlOutput()
         
-    def craw(self,root_url):
+    def craw(self, rooturl):
         count = 1
-        self.urlMangers.addNewUrl(root_url)
-        while self.urlMangers.hasNewUrl():
+        self.urlMangers.add_new_url(rooturl)
+        while self.urlMangers.hasnewurl():
             try:
-                newUrl = self.urlMangers.getNewUrl()
-                print 'craw %d : %s' % (count,newUrl)
-                htmlCont = self.downloaders.download(newUrl)
-                newUrls,newData = self.parsers.parse(newUrl,htmlCont)
-                self.urlMangers.addNewUrls(newUrls)
-                self.outPuters.collectData(newData)
+                newurl = self.urlMangers.get_new_url()
+                print 'craw %d : %s' % (count, newurl)
+                htmlcont = self.downloaders.download(newurl)
+                newurls, newdata = self.parsers.parse(newurl, htmlcont)
+                self.urlMangers.addnewurls(newurls)
+                self.outPuters.collect_data(newdata)
                 if count == 10:
                     break
-                count = count +1
-            except Exception,ex:
-                print 'craw failed',Exception,':',ex
+                count += 1
+            except Exception, ex:
+                print 'craw failed', Exception, ':', ex
             
-        self.outPuters.outputHtml()
+        self.outPuters.output_html()
 
 if __name__ == '__main__':
     loginZhihu()
