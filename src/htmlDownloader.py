@@ -44,6 +44,7 @@ if __name__ == '__main__':
     loginZhihu()
     downl = HtmlDownloader()
     downl.test()
+    print 'hello word'
     #downl.download(root_url)
 
 
