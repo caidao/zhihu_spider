@@ -15,7 +15,7 @@ from pip._vendor import requests
 
 _Zhihu_URL = 'http://www.zhihu.com'
 _Login_URL = _Zhihu_URL + '/login/email'
-_root_url = "https://www.zhihu.com/question/39660507"
+_root_url = "https://www.zhihu.com"
 _Captcha_URL_Prefix = _Zhihu_URL + '/captcha.gif?r='
 _Cookies_File_Name = 'cookies.json'
 _HTML_FILE = '../out/content.html'

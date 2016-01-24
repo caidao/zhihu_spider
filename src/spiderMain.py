@@ -5,7 +5,7 @@ Created on 2016年1月11日
 @author: pan
 """
 import urlManager, htmlDownloader, htmlParaser, htmlOutput
-from src.login_zhihu import loginZhihu
+
 
 class SpiderMain(object):
     def __init__(self):
@@ -33,9 +33,24 @@ class SpiderMain(object):
             
         self.outPuters.output_html()
 
+    def craw_index(self, rooturl):
+        try:
+            #登录知乎网
+            self.downloaders.login()
+            #获取首页页面数据
+            htmlcont = self.downloaders.download(root_url)
+            #解析首页
+            newurls= self.parsers.parse_index(root_url, htmlcont)
+            self.outPuters.collect_index_data(newurls)
+            print len(newurls)
+            self.outPuters.output_html()
+        except Exception, ex:
+            print 'craw_index failed', Exception, ':', ex
+
+
 if __name__ == '__main__':
-    loginZhihu()
     root_url = "https://www.zhihu.com/"
     spider = SpiderMain()
-    spider.craw(root_url)
+    spider.craw_index(root_url)
+    #spider.craw(root_url)
     pass

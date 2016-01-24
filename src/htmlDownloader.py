@@ -4,20 +4,52 @@ Created on 2016年1月11日
 
 @author: pan
 """
-import urllib2
-from src.login_zhihu import loginZhihu, _Cookies_File_Name
+import cookielib
 import json
+import os
+import urllib
+import urllib2
+
+_Zhihu_URL = 'http://www.zhihu.com'
+_Login_URL = _Zhihu_URL + '/login/email'
+_root_url = "https://www.zhihu.com"
+_Captcha_URL_Prefix = _Zhihu_URL + '/captcha.gif?r='
 
 
 class HtmlDownloader(object):
-    
-    
-    @staticmethod
-    def download(url):
+
+    def __init__(self):
+        cj = cookielib.CookieJar()
+        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+        self.opener.addheaders= [('User-agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64)AppleWebKit/537.36 (KHTML, like Gecko) '
+                                                'Chrome/45.0.2454.85 Safari/537.36)')]
+
+    def login(self):
+        email ='panyiwen2009@gmail.com'#raw_input('email: ')
+        password =raw_input('password: ')
+        rep_cap = self.opener.open(_Captcha_URL_Prefix)
+        with open('code.gif', 'wb') as f:
+            f.write(rep_cap.read())
+
+        print('please check code.gif for captcha')
+        captcha = raw_input('captcha: ')
+
+        data = urllib.urlencode({'email': email, 'password': password,
+            'rememberme': 'true', 'captcha': captcha})
+        rep = self.opener.open(_Login_URL, data=data)
+        print rep.getcode()
+        temp = rep.read()
+        j = json.loads(temp, encoding='utf-8')
+        c = int(j['r'])
+        m = j['msg']
+        os.remove('code.gif')
+        return c, m
+
+    def download(self, url):
         if url is None:
             return None
 
-        response = urllib2.urlopen(url)
+        response = self.opener.open(url)
         if response.getcode() != 200:
             return None
 
@@ -26,24 +58,11 @@ class HtmlDownloader(object):
     @staticmethod
     def test():
         root_url = "https://www.zhihu.com/question/39660507"
-        print '第一种方法'
-        opener = urllib2.build_opener()
-        with open(_Cookies_File_Name, 'r') as f:
-            cookies_dict = json.load(f)
-            cookstr = ''
-            for k, v in cookies_dict.items():
-                cookstr += str(k + '=' + v + ';')
-        opener.addheaders.append(('Cookie', cookstr))
-        opener.addheaders.append(('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36'))
-        response1 = opener.open(root_url)
-        print response1.getcode()
-        print response1.read()
             
     
 if __name__ == '__main__':
-    loginZhihu()
     downl = HtmlDownloader()
-    downl.test()
+    downl.login()
     print 'hello word'
     #downl.download(root_url)
 
