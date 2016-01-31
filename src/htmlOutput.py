@@ -20,24 +20,25 @@ class HtmlOutput(object):
     def collect_index_data(self, datas):
         if datas is None:
             return None
-        self.index_datas = datas
+        self.index_datas.append(datas)
 
 
 
     
-    def output_html(self):
-        fout = open('../out/output.html','w')
+    def output_html(self, file_path):
+        fout = open(file_path, 'w')
         fout.write("<html>")
         fout.write("<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head>")
         fout.write("<body>")
         fout.write("<table>")
         
-        for data in self.index_datas:
-            fout.write("<tr>")
-            fout.write("<td>%s</td>" % data['url'].encode('utf-8'))
-            fout.write("<td>%s</td>" % data['title'].encode('utf-8'))
-            fout.write("<td>%s</td>" % data['source'].encode('utf-8'))
-            fout.write("</tr>")
+        for datalist in self.index_datas:
+            for data in datalist:
+                fout.write("<tr>")
+                fout.write("<td><a href=\"%s\">%s</a></td>" % (data['url'].encode('utf-8'), data['url'].encode('utf-8')))
+                fout.write("<td>%s</td>" % data['title'].encode('utf-8'))
+                fout.write("<td>%s</td>" % data['source'].encode('utf-8'))
+                fout.write("</tr>")
         
         fout.write("</table>")
         fout.write("</body>") 
