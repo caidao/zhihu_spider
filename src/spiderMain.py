@@ -14,8 +14,31 @@ class SpiderMain(object):
         self.parsers = htmlParaser.HtmlParser()
         self.outPuters = htmlOutput.HtmlOutput()
 
+    #抓取第一批用户信息
+    def craw_first_user(self, rooturl, secondurls):
+        i = 0
+        for urls in secondurls:
+            for url in urls:
+                #获取问题连接页面
+                htmlcont = self.downloaders.download(url['url'])
+                #解析页面
+                datadict = self.parsers.parse_first_user(rooturl, htmlcont)
+                datadict['url'] = url['url']
+                #收集数据并打印数据
+                self.outPuters.collect_user_data(datadict)
+                print 'user infos :' + datadict['name']
+            #     i+=1
+            #     if i==5:
+            #         break
+            # if i==5:
+            #     break
+        self.outPuters.output_user_html('../out/user_page.html')
+
+
+
     #爬取首页所有连接的页面的评论信息
     def craw_second_page(self, rooturl, indexurls):
+        self.outPuters.clear_index_data()
         for index_url in indexurls:
             #获取问题连接页面
             htmlcont = self.downloaders.download(index_url['url'])
@@ -25,6 +48,7 @@ class SpiderMain(object):
             self.outPuters.collect_index_data(datas)
             print len(datas)
         self.outPuters.output_html('../out/second_page.html')
+        return self.outPuters.get_index_data()
 
     #爬取首页的数据
     def craw_index(self, rooturl):
@@ -48,5 +72,6 @@ if __name__ == '__main__':
     root_url = "https://www.zhihu.com/"
     spider = SpiderMain()
     index_urls = spider.craw_index(root_url)
-    spider.craw_second_page(root_url, index_urls)
+    second_urls = spider.craw_second_page(root_url, index_urls)
+    spider.craw_first_user(root_url, second_urls)
     pass

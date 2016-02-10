@@ -40,6 +40,69 @@ class HtmlParser(object):
         return newurls
 
     @staticmethod
+    def get_first_users(rooturl, soup):
+        retdata = {'name': '', 'bio': '', 'location': '', 'business': '', 'gender': ''}
+        header = soup.find('div', class_='zm-profile-header-main')
+
+        #该用户的主要信息
+        main_node = header.find('div', class_='title-section ellipsis')
+        if main_node is not None:
+            try:
+                retdata['name'] = main_node.find('span', class_='name').get_text()
+                retdata['bio'] = main_node.find('span', class_='bio').get_text()
+            except Exception, ex:
+                print ' get_first_users name', Exception, ':', ex
+
+        #用户其他信息
+        other_node = header.find('div', class_='zm-profile-header-user-describe')
+        if other_node is not None:
+            try:#地点
+                retdata['location'] = other_node.find('span', class_='location item').get('title')
+            except Exception, ex:
+                print ' get_first_users location', Exception, ':', ex
+
+            try:#方向
+                retdata['business'] = other_node.find('span', class_='business item').get('title')
+            except Exception, ex:
+                print ' get_first_users business', Exception, ':', ex
+
+            try:#性别
+                gender = other_node.find('span', class_='item gender').find('i').get('class')
+                if gender[1].find('female')>0:
+                    retdata['gender']=u'女'
+                else:
+                    retdata['gender']=u'男'
+            except Exception, ex:
+                print ' get_first_users gender', Exception, ':', ex
+
+            try:#公司
+                retdata['employment'] = other_node.find('span', class_='employment item').get('title')
+            except Exception, ex:
+                retdata['employment']=''
+                print ' get_first_users employment', Exception, ':', ex
+
+            try:#职位
+                retdata['position'] = other_node.find('span', class_='position item').get('title')
+            except Exception, ex:
+                retdata['position']=''
+                print ' get_first_users position', Exception, ':', ex
+
+            try:#学校
+                retdata['school'] = other_node.find('span', class_='education item').get('title')
+            except Exception, ex:
+                retdata['school'] = ''
+                print ' get_first_users school', Exception, ':', ex
+
+            try:#专业
+                retdata['major'] = other_node.find('span', class_='education-extra item').get('title')
+            except Exception, ex:
+                retdata['major'] = ''
+                print ' get_first_users major', Exception, ':', ex
+
+
+        return retdata
+
+    @staticmethod
     def get_second_page_data(rooturl, soup):
         datalist = list()
         links = soup.find_all('div', class_='zm-item-answer  zm-item-expanded')
@@ -127,8 +190,12 @@ class HtmlParser(object):
         soup = BeautifulSoup(htmlcontent, 'html.parser', from_encoding='utf-8')
         return self.get_second_page_data(rooturl, soup)
 
-
-
+    #解析评论的用户信息
+    def parse_first_user(self, rooturl, htmlcontent):
+        if rooturl is None or htmlcontent is None:
+            return None
+        soup = BeautifulSoup(htmlcontent, 'html.parser', from_encoding='utf-8')
+        return self.get_first_users(rooturl, soup)
 
 
 
