@@ -29,6 +29,12 @@ class HtmlOutput(object):
             return None
         self.fisrt_user_data.append(datas)
 
+    def get_user_data(self):
+        return self.fisrt_user_data
+
+    def clear_user_data(self):
+        self.fisrt_user_data=list()
+
     def get_index_data(self):
         return self.index_datas
 
@@ -66,7 +72,7 @@ class HtmlOutput(object):
         fout.write("<body>")
         fout.write("<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\">")
         fout.write("<tr><th>昵称</th><th>介绍</th><th>地址</th><th>方向</th><th>性别</th><th>公司</th><th>职业</th>"
-                   "<th>学校</th><th>专业</th><th>主页</th><</tr>")
+                   "<th>学校</th><th>专业</th><th>主页</th><th>关注了</th><th>关注者</th></tr>")
 
         for data in self.fisrt_user_data:
                 fout.write("<tr>")
@@ -80,6 +86,8 @@ class HtmlOutput(object):
                 fout.write("<td>%s</td>" % data['school'].encode('utf-8'))
                 fout.write("<td>%s</td>" % data['major'].encode('utf-8'))
                 fout.write("<td><a href=\"%s\">%s</a></td>" %(data['url'].encode('utf-8'), data['url'].encode('utf-8')))
+                fout.write("<td>%s</td>" % data['followees'].encode('utf-8'))
+                fout.write("<td>%s</td>" % data['followers'].encode('utf-8'))
                 fout.write("</tr>")
 
         fout.write("</table>")
