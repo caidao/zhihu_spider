@@ -26,6 +26,11 @@ class SpiderMain(object):
             print len(datas)
         self.outPuters.output_html('../out/second_page.html')
 
+
+    #爬取用户信息
+    def craw_user_info(self):
+        pass
+
     #爬取首页的数据
     def craw_index(self, rooturl):
         try:
