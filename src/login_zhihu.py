@@ -140,6 +140,8 @@ def test_url_login():
 
 
 if __name__ == '__main__':
-    #_init()
-    #create_cookies()
-    test_url_login()
+      strin = 'xxfemaless'
+      if strin.find('emale')>0:
+         print 'male'
+      else:
+         print('femal')
