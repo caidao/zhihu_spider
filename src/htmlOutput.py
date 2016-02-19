@@ -4,6 +4,7 @@ Created on 2016年1月11日
 
 @author: pan
 """
+import dao
 
 
 class HtmlOutput(object):
@@ -11,6 +12,7 @@ class HtmlOutput(object):
         self.datas =[]
         self.index_datas = list()
         self.fisrt_user_data = list()
+        self.dao = dao.Dao()
 
         
     
@@ -94,8 +96,27 @@ class HtmlOutput(object):
         fout.write("</body>")
         fout.write("</html>")
         fout.close()
-    
-    
+
+    def output_user_mysql(self):
+        user_info_list =list()
+        for data_dict in self.fisrt_user_data:
+            data_list = list()
+            data_list.append(data_dict['name'].encode('utf-8'))
+            data_list.append(data_dict['bio'].encode('utf-8'))
+            data_list.append(data_dict['location'].encode('utf-8'))
+            data_list.append(data_dict['business'].encode('utf-8'))
+            data_list.append(data_dict['gender'].encode('utf-8'))
+            data_list.append(data_dict['employment'].encode('utf-8'))
+            data_list.append(data_dict['position'].encode('utf-8'))
+            data_list.append(data_dict['school'].encode('utf-8'))
+            data_list.append(data_dict['major'].encode('utf-8'))
+            data_list.append(data_dict['url'].encode('utf-8'))
+            data_list.append(data_dict['followees'].encode('utf-8'))
+            data_list.append(data_dict['followers'].encode('utf-8'))
+            user_info_list.append(data_list)
+        self.dao.insert(user_info_list)
 
 
+    def close(self):
+        self.dao.close_conn()
 

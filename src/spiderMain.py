@@ -4,6 +4,8 @@ Created on 2016年1月11日
 
 @author: pan
 """
+import time
+
 import urlManager, htmlDownloader, htmlParaser, htmlOutput
 
 
@@ -18,36 +20,37 @@ class SpiderMain(object):
     def craw_relative_user(self, rooturl, src_users):
         relatelist = list()
         for users in src_users:
-            #获取用户信息页面(该用户关注的用户)
-            htmlcont_followees = self.downloaders.download(users['url']+'/followees')
-            datalist = self.parsers.parse_follow_user(rooturl, htmlcont_followees)
-            relatelist.append(datalist)
-            #获取被关注用户关注信息(关注改用户的用户)
-            htmlcont_followers = self.downloaders.download(users['url']+'/followers')
-            datalist = self.parsers.parse_follow_user(rooturl, htmlcont_followers)
-            relatelist.append(datalist)
+            try:
+                #获取用户信息页面(该用户关注的用户)
+                htmlcont_followees = self.downloaders.download(users['url']+'/followees')
+                datalist = self.parsers.parse_follow_user(rooturl, htmlcont_followees)
+                relatelist.append(datalist)
+                #获取被关注用户关注信息(关注改用户的用户)
+                htmlcont_followers = self.downloaders.download(users['url']+'/followers')
+                datalist = self.parsers.parse_follow_user(rooturl, htmlcont_followers)
+                relatelist.append(datalist)
+            except Exception, ex:
+                print(Exception, ex)
         return relatelist
 
     #抓取第一批用户信息
-    def craw_user(self, rooturl, secondurls, file_out):
+    def craw_user(self, rooturl, secondurls):
         i = 0
         self.outPuters.clear_user_data()
         for urls in secondurls:
             for url in urls:
-                #获取问题连接页面
-                htmlcont = self.downloaders.download(url['url'])
-                #解析页面
-                datadict = self.parsers.parse_first_user(rooturl, htmlcont)
-                datadict['url'] = url['url']
-                #收集数据并打印数据
-                self.outPuters.collect_user_data(datadict)
-                print 'user infos :' + datadict['name']
-                i+=1
-                if i==5:
-                    break
-            if i==5:
-                break
-        self.outPuters.output_user_html(file_out)
+                try:
+                    #获取问题连接页面
+                    htmlcont = self.downloaders.download(url['url'])
+                    #解析页面
+                    datadict = self.parsers.parse_first_user(rooturl, htmlcont)
+                    datadict['url'] = url['url']
+                    #收集数据并打印数据
+                    self.outPuters.collect_user_data(datadict)
+                    print 'user infos :' + datadict['name']
+                except Exception, ex:
+                    print(Exception, ex)
+            self.outPuters.output_user_mysql()
         return self.outPuters.get_user_data()
 
 
@@ -62,7 +65,7 @@ class SpiderMain(object):
             #收集并打印数据
             self.outPuters.collect_index_data(datas)
             print len(datas)
-        self.outPuters.output_html('../out/second_page.html')
+        self.outPuters.output_html('../out/second_page'+time.strftime('%Y-%m-%d', time.localtime(time.time()))+'.html')
         return self.outPuters.get_index_data()
 
 
@@ -82,10 +85,13 @@ class SpiderMain(object):
             #收集并打印数据
             self.outPuters.collect_index_data(newurls)
             print len(newurls)
-            self.outPuters.output_html('../out/index.html')
+            self.outPuters.output_html('../out/index'+time.strftime('%Y-%m-%d', time.localtime(time.time()))+'.html')
             return newurls
         except RuntimeError, ex:
             print 'craw_index failed', RuntimeError, ':', ex
+
+    def close(self):
+        self.outPuters.close()
 
 
 if __name__ == '__main__':
@@ -93,10 +99,13 @@ if __name__ == '__main__':
     spider = SpiderMain()
     index_urls = spider.craw_index(root_url)
     second_urls = spider.craw_second_page(root_url, index_urls)
-    src_users = spider.craw_user(root_url, second_urls, '../out/user1_page.html')
-    relative_users = spider.craw_relative_user(root_url, src_users)
-    src_users = spider.craw_user(root_url, relative_users, '../out/user2_page.html')
-    relative_users = spider.craw_relative_user(root_url, src_users)
-    src_users = spider.craw_user(root_url, relative_users, '../out/user3_page.html')
+    src_users = spider.craw_user(root_url, second_urls)
+
+    for i in range(10):
+        relative_users = spider.craw_relative_user(root_url, src_users)
+        src_users = spider.craw_user(root_url, relative_users)
+
+
+    spider.close()
 
     pass
