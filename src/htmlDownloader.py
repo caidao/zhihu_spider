@@ -9,6 +9,7 @@ import json
 import os
 import urllib
 import urllib2
+import filter
 
 _Zhihu_URL = 'http://www.zhihu.com'
 _Login_URL = _Zhihu_URL + '/login/email'
@@ -23,6 +24,7 @@ class HtmlDownloader(object):
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         self.opener.addheaders= [('User-agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64)AppleWebKit/537.36 (KHTML, like Gecko) '
                                                 'Chrome/45.0.2454.85 Safari/537.36)')]
+        self.filter = filter.Filter()
 
     def login(self):
         email ='panyiwen2009@gmail.com'#raw_input('email: ')
@@ -47,6 +49,11 @@ class HtmlDownloader(object):
 
     def download(self, url):
         if url is None:
+            return None
+
+        #过滤重复的url
+        if self.filter.check(url):
+            print '重复url : %s', (url)
             return None
 
         response = self.opener.open(url)

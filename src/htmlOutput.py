@@ -97,9 +97,9 @@ class HtmlOutput(object):
         fout.write("</html>")
         fout.close()
 
-    def output_user_mysql(self):
+    def output_user_mysql(self, dictlist):
         user_info_list =list()
-        for data_dict in self.fisrt_user_data:
+        for data_dict in dictlist:
             data_list = list()
             data_list.append(data_dict['name'].encode('utf-8'))
             data_list.append(data_dict['bio'].encode('utf-8'))
@@ -113,6 +113,7 @@ class HtmlOutput(object):
             data_list.append(data_dict['url'].encode('utf-8'))
             data_list.append(data_dict['followees'].encode('utf-8'))
             data_list.append(data_dict['followers'].encode('utf-8'))
+            data_list.append(data_dict['url'].encode('utf-8'))
             user_info_list.append(data_list)
         self.dao.insert(user_info_list)
 

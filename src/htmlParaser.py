@@ -57,8 +57,8 @@ class HtmlParser(object):
             try:
                 retdata['name'] = main_node.find('span', class_='name').get_text()
                 retdata['bio'] = main_node.find('span', class_='bio').get_text()
-            except Exception, ex:
-                print ' get_first_users name', Exception, ':', ex
+            except:
+                pass
 
         # 用户其他信息
         other_node = header.find('div', class_='zm-profile-header-user-describe')
@@ -66,12 +66,14 @@ class HtmlParser(object):
             try:  # 地点
                 retdata['location'] = other_node.find('span', class_='location item').get('title')
             except Exception, ex:
-                print ' get_first_users location', Exception, ':', ex
+                #print ' get_first_users location', Exception, ':', ex
+                pass
 
             try:  # 方向
                 retdata['business'] = other_node.find('span', class_='business item').get('title')
             except Exception, ex:
-                print ' get_first_users business', Exception, ':', ex
+                #print ' get_first_users business', Exception, ':', ex
+                pass
 
             try:  # 性别
                 gender = other_node.find('span', class_='item gender').find('i').get('class')
@@ -80,41 +82,42 @@ class HtmlParser(object):
                 else:
                     retdata['gender'] = u'男'
             except Exception, ex:
-                print ' get_first_users gender', Exception, ':', ex
+                #print ' get_first_users gender', Exception, ':', ex
+                pass
 
             try:  # 公司
                 retdata['employment'] = other_node.find('span', class_='employment item').get('title')
             except Exception, ex:
                 retdata['employment'] = ''
-                print ' get_first_users employment', Exception, ':', ex
+                #print ' get_first_users employment', Exception, ':', ex
 
             try:  # 职位
                 retdata['position'] = other_node.find('span', class_='position item').get('title')
             except Exception, ex:
                 retdata['position'] = ''
-                print ' get_first_users position', Exception, ':', ex
+                #print ' get_first_users position', Exception, ':', ex
 
             try:  # 学校
                 retdata['school'] = other_node.find('span', class_='education item').get('title')
             except Exception, ex:
                 retdata['school'] = ''
-                print ' get_first_users school', Exception, ':', ex
+                #print ' get_first_users school', Exception, ':', ex
 
             try:  # 专业
                 retdata['major'] = other_node.find('span', class_='education-extra item').get('title')
             except Exception, ex:
                 retdata['major'] = ''
-                print ' get_first_users major', Exception, ':', ex
+                #print ' get_first_users major', Exception, ':', ex
 
             try:  # 关注者和被关注者
                 ob_node = soup.find('div', class_='zm-profile-side-following zg-clear')
                 a = ob_node.find('a', href=re.compile(r"/people/.*?/followees"))
                 retdata['followees'] = a.find('strong').get_text()
                 retdata['followers'] = ob_node.find('a', href=re.compile(r"/people/.*?/followers")).find('strong').get_text()
-            except Exception, ex:
+            except:
                 retdata['followees'] = '0'
                 retdata['followers'] = '0'
-                print ' get_first_users following', Exception, ':', ex
+                #print ' get_first_users following', Exception, ':', ex
 
         return retdata
 

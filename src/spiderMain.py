@@ -38,19 +38,23 @@ class SpiderMain(object):
         i = 0
         self.outPuters.clear_user_data()
         for urls in secondurls:
+            dictlist = list()
             for url in urls:
                 try:
                     #获取问题连接页面
                     htmlcont = self.downloaders.download(url['url'])
+                    if htmlcont is None:
+                        continue
                     #解析页面
                     datadict = self.parsers.parse_first_user(rooturl, htmlcont)
                     datadict['url'] = url['url']
                     #收集数据并打印数据
                     self.outPuters.collect_user_data(datadict)
-                    print 'user infos :' + datadict['name']
+                    dictlist.append(datadict)
+                    print 'user infos :' + datadict['name']+ ' '+ datadict['url']
                 except Exception, ex:
                     print(Exception, ex)
-            self.outPuters.output_user_mysql()
+            self.outPuters.output_user_mysql(dictlist)
         return self.outPuters.get_user_data()
 
 

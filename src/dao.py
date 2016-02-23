@@ -10,7 +10,7 @@ class Dao(object):
 
     def insert(self, user_info_list):
         sql = "insert into user_tbl (name,bio,location,business,gender,companies,profession,school,major,src," \
-              "followees,folloeers) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+              "followees,folloeers,url) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         try:
             self.cursor.executemany(sql, user_info_list)
             self.conn.commit()
