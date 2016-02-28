@@ -7,19 +7,25 @@ Created on 2016年1月11日
 import time
 
 import urlManager, htmlDownloader, htmlParaser, htmlOutput
+import threadpool
+import dao
 
 
 class SpiderMain(object):
-    def __init__(self):
+    def __init__(self, root_url):
+        self.dao = dao.Dao()
         self.urlMangers = urlManager.UrlManger()
-        self.downloaders= htmlDownloader.HtmlDownloader()
+        self.downloaders= htmlDownloader.HtmlDownloader(self.dao)
         self.parsers = htmlParaser.HtmlParser()
-        self.outPuters = htmlOutput.HtmlOutput()
+        self.outPuters = htmlOutput.HtmlOutput(self.dao)
+        self.root_url = root_url
+        self.dictlist = list()
+        self.pool = threadpool.ThreadPool(8)
 
-    #抓取关联用户信息(第一批用户关注了和关注者)
-    def craw_relative_user(self, rooturl, src_users):
+    #抓取关联用户信息
+    def craw_relative_user(self, rooturl, srcusers):
         relatelist = list()
-        for users in src_users:
+        for users in srcusers:
             try:
                 #获取用户信息页面(该用户关注的用户)
                 htmlcont_followees = self.downloaders.download(users['url']+'/followees')
@@ -33,29 +39,53 @@ class SpiderMain(object):
                 print(Exception, ex)
         return relatelist
 
-    #抓取第一批用户信息
+    #抓取用户信息
     def craw_user(self, rooturl, secondurls):
-        i = 0
         self.outPuters.clear_user_data()
         for urls in secondurls:
-            dictlist = list()
-            for url in urls:
-                try:
-                    #获取问题连接页面
-                    htmlcont = self.downloaders.download(url['url'])
-                    if htmlcont is None:
-                        continue
-                    #解析页面
-                    datadict = self.parsers.parse_first_user(rooturl, htmlcont)
-                    datadict['url'] = url['url']
-                    #收集数据并打印数据
-                    self.outPuters.collect_user_data(datadict)
-                    dictlist.append(datadict)
-                    print 'user infos :' + datadict['name']+ ' '+ datadict['url']
-                except Exception, ex:
-                    print(Exception, ex)
-            self.outPuters.output_user_mysql(dictlist)
+            self.dictlist = list()
+            # for url in urls:
+            #     try:
+            #         #获取问题连接页面
+            #         htmlcont = self.downloaders.download(url['url'])
+            #         if htmlcont is None:
+            #             continue
+            #         #解析页面
+            #         datadict = self.parsers.parse_first_user(rooturl, htmlcont)
+            #         datadict['url'] = url['url']
+            #         #收集数据并打印数据
+            #         self.outPuters.collect_user_data(datadict)
+            #         dictlist.append(datadict)
+            #         print 'user infos :' + datadict['name']+ ' '+ datadict['url']
+            #     except Exception, ex:
+            #         print(Exception, ex)
+            requests = threadpool.makeRequests(self._userinfo_, urls, self._collect_user)
+            [self.pool.putRequest(req) for req in requests]
+            self.pool.wait()
+            self.outPuters.output_user_mysql(self.dictlist)
         return self.outPuters.get_user_data()
+
+    def _collect_user(self, request, datadict):
+        if datadict is None:
+            return
+        self.dictlist.append(datadict)
+        print '%s %s %s %s' %(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), request.requestID, datadict['name'], datadict['url'])
+
+    def _userinfo_(self, url):
+        try:
+            #获取问题连接页面
+            htmlcont = self.downloaders.download(url['url'])
+            if htmlcont is None:
+                return None
+            #解析页面
+            datadict = self.parsers.parse_first_user(self.root_url, htmlcont)
+            datadict['url'] = url['url']
+            #收集数据并打印数据
+            self.outPuters.collect_user_data(datadict)
+        except Exception, ex:
+            print(Exception, ex)
+            return None
+        return datadict
 
 
     #爬取首页所有连接的页面的评论信息
@@ -72,10 +102,6 @@ class SpiderMain(object):
         self.outPuters.output_html('../out/second_page'+time.strftime('%Y-%m-%d', time.localtime(time.time()))+'.html')
         return self.outPuters.get_index_data()
 
-
-    #爬取用户信息
-    def craw_user_info(self):
-        pass
 
     #爬取首页的数据
     def craw_index(self, rooturl):
@@ -100,7 +126,7 @@ class SpiderMain(object):
 
 if __name__ == '__main__':
     root_url = "https://www.zhihu.com/"
-    spider = SpiderMain()
+    spider = SpiderMain(root_url)
     index_urls = spider.craw_index(root_url)
     second_urls = spider.craw_second_page(root_url, index_urls)
     src_users = spider.craw_user(root_url, second_urls)

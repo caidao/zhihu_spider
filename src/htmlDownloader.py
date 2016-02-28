@@ -19,12 +19,12 @@ _Captcha_URL_Prefix = _Zhihu_URL + '/captcha.gif?r='
 
 class HtmlDownloader(object):
 
-    def __init__(self):
+    def __init__(self, dao_obj):
         cj = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         self.opener.addheaders= [('User-agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64)AppleWebKit/537.36 (KHTML, like Gecko) '
                                                 'Chrome/45.0.2454.85 Safari/537.36)')]
-        self.filter = filter.Filter()
+        self.filter = filter.Filter(dao_obj.get_bloom())
 
     def login(self):
         email ='panyiwen2009@gmail.com'#raw_input('email: ')

@@ -4,15 +4,14 @@ Created on 2016年1月11日
 
 @author: pan
 """
-import dao
 
 
 class HtmlOutput(object):
-    def __init__(self):
+    def __init__(self, dao_obj):
         self.datas =[]
         self.index_datas = list()
         self.fisrt_user_data = list()
-        self.dao = dao.Dao()
+        self.dao = dao_obj
 
         
     
